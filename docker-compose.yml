@@ -53,6 +53,16 @@ services:
       - monitoring
     restart: unless-stopped
 
+  hls-keepalive:
+    image: curlimages/curl:8.12.1
+    container_name: hls-keepalive
+    command: sh -c "while true; do curl -s -m 5 http://mediamtx:8888/camera1/index.m3u8 > /dev/null; sleep 5; done"
+    depends_on:
+      - mediamtx
+    networks:
+      - monitoring
+    restart: unless-stopped
+
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
