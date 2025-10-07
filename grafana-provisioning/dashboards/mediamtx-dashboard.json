@@ -570,6 +570,7 @@
     "to": "now"
   },
   "timepicker": {},
+  "refresh": "5s",
   "timezone": "",
   "title": "MediaMTX Monitoring Dashboard",
   "uid": "mediamtx-dashboard",
