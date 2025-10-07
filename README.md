@@ -6,12 +6,12 @@ A comprehensive video streaming monitoring solution using MediaMTX, Prometheus, 
 
 - **MediaMTX**: RTSP/RTMP/HLS/WebRTC streaming server with metrics endpoint
 - **Prometheus**: Metrics collection and storage
-- **Grafana**: Visualization and dashboards with **optimized provisioning** (automatic setup)
+- **Grafana**: Visualization and dashboards with **automatic provisioning**
 - **Node Exporter**: System metrics (CPU, memory, disk, network)
 - **cAdvisor**: Container metrics and resource usage
 - **Custom MediaMTX Exporter**: Python-based custom metrics collector
 
-## ⚡ Grafana Provisioning Optimization
+## ⚡ Grafana Provisioning
 
 This system uses **Grafana Provisioning** for automatic configuration:
 
@@ -30,7 +30,6 @@ This system uses **Grafana Provisioning** for automatic configuration:
 ## 🔐 Authentication & Security
 
 ### Current Configuration
-
 - **Grafana**: `admin` / `admin` (Dashboard access)
 - **MediaMTX API**: No authentication required (simplified setup)
 - **MediaMTX Metrics**: No authentication required
@@ -38,7 +37,6 @@ This system uses **Grafana Provisioning** for automatic configuration:
 - **All Exporters**: No authentication required
 
 ### Security Features
-
 - Grafana admin interface protected
 - MediaMTX configured for simplified access (no auth barriers)
 - All metrics endpoints accessible for monitoring
@@ -48,7 +46,6 @@ This system uses **Grafana Provisioning** for automatic configuration:
 ## 🚀 Quick Start
 
 ### Prerequisites
-
 - Docker and Docker Compose installed
 - Ports 3000, 9090, 8887, 8888, 8889, 8554, 1935, 9998, 8080, 8081, 9100 available
 
@@ -76,7 +73,7 @@ docker-compose logs -f grafana
 
 ### 🆕 Optimized Deployment Workflow
 
-With the new Grafana provisioning setup:
+With the Grafana provisioning setup:
 
 1. **Clone/Download** the project
 2. **Start services**: `./start-monitoring.sh` or `docker-compose up -d`
@@ -102,16 +99,17 @@ With the new Grafana provisioning setup:
 
 ## 📹 Camera Configuration
 
-The system is configured for camera integration:
+The system is configured for camera integration with two cameras:
 
 ```yaml
-# Camera RTSP URL (configured in mediamtx.yml)
+# Camera configurations (in mediamtx-clean.yml)
 Camera 1: rtsp://admin:Tatva%40321@183.82.113.87:554/Streaming/Channels/301
+Camera 2: rtsp://admin:admin@192.168.1.4:1935
 ```
 
 ### Adding New Cameras
 
-1. Edit `mediamtx.yml` under the `paths` section:
+1. Edit `mediamtx-clean.yml` under the `paths` section:
 ```yaml
 paths:
   ~^new_camera$:
@@ -127,14 +125,12 @@ docker-compose restart mediamtx
 ## 📈 Metrics Available
 
 ### MediaMTX Custom Metrics (via mediamtx-exporter)
-- `mediamtx_paths_total`: Number of configured paths (demo data)
-- `mediamtx_readers_total`: Number of active readers/viewers (simulated)
-- `mediamtx_bytes_received_total`: Total bytes received from sources (simulated)
-- `mediamtx_bytes_sent_total`: Total bytes sent to readers (simulated)
-- `mediamtx_connections_total`: Total active connections (simulated)
+- `mediamtx_exporter_up`: Exporter status (1=up, 0=down)
+- `mediamtx_exporter_scrape_duration_seconds`: Time spent scraping MediaMTX
+- All MediaMTX native metrics (when available)
 
-### 📊 Dashboard Panels (Optimized)
-The Grafana dashboard includes the following monitoring panels:
+### 📊 Dashboard Panels
+The Grafana dashboard includes monitoring panels for:
 - **Active Paths**: Real-time count of MediaMTX streaming paths
 - **Bytes Received from Sources**: Data throughput from camera sources
 - **Bytes Sent to Viewers**: Data throughput to connected viewers
@@ -144,7 +140,7 @@ The Grafana dashboard includes the following monitoring panels:
 
 ### 📈 Data Sources
 - **✅ Real Data**: CPU usage, System metrics (Node Exporter)
-- **📊 Simulated Data**: MediaMTX custom metrics (realistic demo data)
+- **📊 MediaMTX Data**: Real MediaMTX metrics (when available)
 - **📈 Container Metrics**: Docker container resource usage (cAdvisor)
 
 ### System Metrics (Node Exporter)
@@ -165,11 +161,13 @@ The Grafana dashboard includes the following monitoring panels:
 monitoring-system/
 ├── 📄 docker-compose.yml              # Service orchestration and networking
 ├── 📄 Dockerfile.mediamtx-exporter    # Custom exporter container build
-├── 📄 mediamtx-exporter.py            # Python metrics exporter with demo data
-├── 📄 mediamtx.yml                    # MediaMTX server configuration
+├── 📄 mediamtx-exporter.py            # Python metrics exporter
+├── 📄 mediamtx-clean.yml              # MediaMTX server configuration (active)
+├── 📄 mediamtx.yml                    # MediaMTX server configuration (backup)
 ├── 📄 prometheus.yml                  # Prometheus collection rules and targets
 ├── 📄 README.md                       # This documentation file
 ├── 📄 start-monitoring.sh             # Optimized startup script
+├── 📄 restart-monitoring.sh           # Restart script with fixes
 └── 📁 grafana-provisioning/           # Grafana automatic configuration
     ├── 📁 datasources/
     │   └── 📄 prometheus.yml          # Auto-configured Prometheus datasource
@@ -178,33 +176,21 @@ monitoring-system/
         └── 📄 mediamtx-dashboard.json # Monitoring dashboard
 ```
 
-### 🆕 Recent Optimizations
-
-**Grafana Provisioning Structure** (Latest Update):
-- ✅ **Eliminated manual setup**: No more manual datasource configuration
-- ✅ **Centralized configuration**: All Grafana settings in `grafana-provisioning/`
-- ✅ **Automatic dashboard loading**: Dashboards appear immediately on startup
-- ✅ **Version control ready**: All configuration files tracked in files
-- ✅ **Cleaner structure**: Removed redundant files and duplicate configurations
-- ✅ **Fixed compatibility issues**: Removed deprecated Angular-based plugins
-- ✅ **Optimized datasource config**: Updated to latest Grafana provisioning format
-- ✅ **Fixed MediaMTX configuration**: Removed invalid `apiAuthentication` fields
-- ✅ **Resolved container restart issues**: MediaMTX now runs stable without errors
-- ✅ **Streamlined system**: Clean, focused monitoring setup
-
 ## 🔧 Configuration Files
 
 ### Core Configuration
 - **`docker-compose.yml`**: Service orchestration, networking, and volume mounts
-- **`mediamtx.yml`**: MediaMTX server configuration with camera source
+- **`mediamtx-clean.yml`**: MediaMTX server configuration with camera sources (active)
+- **`mediamtx.yml`**: MediaMTX server configuration (backup)
 - **`prometheus.yml`**: Prometheus collection rules and scrape targets
 - **`start-monitoring.sh`**: Optimized startup script with health checks
+- **`restart-monitoring.sh`**: Restart script with timeout fixes
 
 ### Custom Exporter
-- **`mediamtx-exporter.py`**: Python-based custom metrics collector with demo data
+- **`mediamtx-exporter.py`**: Python-based custom metrics collector
 - **`Dockerfile.mediamtx-exporter`**: Container build configuration for custom exporter
 
-### Grafana Provisioning (Optimized)
+### Grafana Provisioning
 - **`grafana-provisioning/datasources/prometheus.yml`**: Automatic Prometheus datasource configuration
 - **`grafana-provisioning/dashboards/dashboard.yml`**: Dashboard provisioning settings
 - **`grafana-provisioning/dashboards/mediamtx-dashboard.json`**: Pre-configured monitoring dashboard
@@ -226,6 +212,9 @@ docker-compose pull && docker-compose up -d
 
 # Check service health
 docker-compose ps
+
+# Restart with fixes (if needed)
+./restart-monitoring.sh
 ```
 
 ## 🚨 Troubleshooting
@@ -233,7 +222,7 @@ docker-compose ps
 ### Common Issues
 
 1. **Camera connection failed**
-   - Check camera IP and credentials in `mediamtx.yml`
+   - Check camera IP and credentials in `mediamtx-clean.yml`
    - Verify network connectivity to camera
    - Check RTSP URL format
 
@@ -260,15 +249,12 @@ docker-compose ps
 4. **MediaMTX container restarting/not working**
    - Check for invalid configuration fields: `docker-compose logs mediamtx`
    - **Common Issue**: `apiAuthentication` and `metricsAuthentication` are not valid MediaMTX fields
-   - **Solution**: Remove these fields from `mediamtx.yml`:
-     ```bash
-     # Remove invalid authentication fields
-     sed -i '/apiAuthentication:/,/^$/d' mediamtx.yml
-     sed -i '/metricsAuthentication:/,/^$/d' mediamtx.yml
-     
-     # Restart MediaMTX
-     docker-compose restart mediamtx
-     ```
+   - **Solution**: Use `mediamtx-clean.yml` which has the correct configuration
+
+5. **Custom exporter issues**
+   - Check exporter health: `http://localhost:8081/health`
+   - Review exporter logs: `docker-compose logs mediamtx-exporter`
+   - Restart with fixes: `./restart-monitoring.sh`
 
 ### Logs Location
 
@@ -280,6 +266,7 @@ docker-compose logs
 docker-compose logs mediamtx
 docker-compose logs prometheus
 docker-compose logs grafana
+docker-compose logs mediamtx-exporter
 ```
 
 ## 🔄 Updates & Maintenance
@@ -305,9 +292,9 @@ docker-compose logs grafana
 4. Rebuild custom exporter: `docker-compose build mediamtx-exporter`
 
 ### Security Hardening
-1. Enable authentication in `mediamtx.yml` if needed
+1. Enable authentication in `mediamtx-clean.yml` if needed
 2. Change Grafana admin password in `docker-compose.yml`
-3. Enable TLS for WebRTC in `mediamtx.yml`
+3. Enable TLS for WebRTC in `mediamtx-clean.yml`
 4. Implement network segmentation
 5. Regular security updates
 
@@ -318,3 +305,33 @@ For issues and questions:
 2. Verify configuration syntax
 3. Test network connectivity
 4. Review MediaMTX documentation: https://github.com/bluenviron/mediamtx
+
+## 🎯 Key Features
+
+- **Real-time Monitoring**: Live metrics from MediaMTX streaming server
+- **Automatic Configuration**: Grafana provisioning eliminates manual setup
+- **Multi-Camera Support**: Configured for multiple RTSP camera sources
+- **Container-Based**: Easy deployment with Docker Compose
+- **Custom Metrics**: Python-based exporter for enhanced monitoring
+- **Health Checks**: Built-in health monitoring for all services
+- **Comprehensive Logging**: Detailed logs for troubleshooting
+
+## 🚀 Getting Started
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/shivamskr151/monitoring_system.git
+   cd monitoring_system
+   ```
+
+2. **Start the system**:
+   ```bash
+   chmod +x start-monitoring.sh
+   ./start-monitoring.sh
+   ```
+
+3. **Access Grafana**: http://localhost:3000 (admin/admin)
+
+4. **Monitor your streams**: All dashboards and datasources are automatically configured!
+
+Your MediaMTX monitoring system is now ready to monitor your video streaming infrastructure! 🎉
