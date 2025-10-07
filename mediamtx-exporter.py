@@ -31,7 +31,8 @@ class MediaMTXExporter:
         """Fetch real metrics from MediaMTX endpoint"""
         # MediaMTX metrics endpoint requires authentication
         auth_methods = [
-            None,  # No auth first (since MTX_METRICS_AUTH=none)
+            ("admin", "secret123"),  # Correct MediaMTX credentials from config
+            None,  # No auth fallback
             ("admin", "admin"),  # Default MediaMTX credentials
             ("mediamtx", "mediamtx"),
             ("root", "root"),
@@ -41,7 +42,7 @@ class MediaMTXExporter:
         
         for auth in auth_methods:
             try:
-                response = self.session.get(self.metrics_url, auth=auth, timeout=2)
+                response = self.session.get(self.metrics_url, auth=auth, timeout=10)
                 response.raise_for_status()
                 logger.info(f"Successfully fetched real MediaMTX metrics with auth: {auth}")
                 return response.text
@@ -84,15 +85,36 @@ class MediaMTXExporter:
             for line in metrics_text.splitlines():
                 line = line.strip()
                 if not line.startswith("#") and line != "":
-                    parts = line.split()
-                    if len(parts) == 2:
-                        key, value = parts
-                        try:
-                            parsed_metrics[key] = float(value)
-                        except ValueError:
-                            parsed_metrics[key] = value
+                    # Handle Prometheus metrics with labels (e.g., "metric{label1="value1",label2="value2"} 1.0")
+                    if "{" in line and "}" in line:
+                        # Find the metric name and labels
+                        metric_start = line.find("{")
+                        metric_end = line.find("}")
+                        if metric_start > 0 and metric_end > metric_start:
+                            metric_name = line[:metric_start]
+                            # Extract value after the closing brace
+                            value_part = line[metric_end + 1:].strip()
+                            if value_part:
+                                try:
+                                    value = float(value_part)
+                                    parsed_metrics[line] = value  # Keep the full metric line as key
+                                except ValueError:
+                                    parsed_metrics[line] = value_part
+                            else:
+                                logger.debug(f"Skipping malformed metric line: {line}")
+                        else:
+                            logger.debug(f"Skipping malformed metric line: {line}")
                     else:
-                        logger.debug(f"Skipping malformed metric line: {line}")
+                        # Handle simple metrics without labels
+                        parts = line.split()
+                        if len(parts) == 2:
+                            key, value = parts
+                            try:
+                                parsed_metrics[key] = float(value)
+                            except ValueError:
+                                parsed_metrics[key] = value
+                        else:
+                            logger.debug(f"Skipping malformed metric line: {line}")
             
             self.metrics_data = parsed_metrics
             logger.info(f"Successfully parsed {len(parsed_metrics)} metrics from MediaMTX")
@@ -119,12 +141,16 @@ mediamtx_exporter_scrape_duration_seconds 0
         metrics_text += "# TYPE mediamtx_exporter_up gauge\n"
         metrics_text += "mediamtx_exporter_up 1\n"
         
-        for metric_name, value in self.metrics_data.items():
-            # Clean metric name for Prometheus (replace invalid characters)
-            clean_name = metric_name.replace("-", "_").replace(".", "_")
-            metrics_text += f"# HELP {clean_name} MediaMTX metric: {metric_name}\n"
-            metrics_text += f"# TYPE {clean_name} gauge\n"
-            metrics_text += f"{clean_name} {value}\n"
+        for metric_line, value in self.metrics_data.items():
+            # If the metric already has labels, use it as-is
+            if "{" in metric_line and "}" in metric_line:
+                metrics_text += f"{metric_line}\n"
+            else:
+                # Clean metric name for Prometheus (replace invalid characters)
+                clean_name = metric_line.replace("-", "_").replace(".", "_")
+                metrics_text += f"# HELP {clean_name} MediaMTX metric: {metric_line}\n"
+                metrics_text += f"# TYPE {clean_name} gauge\n"
+                metrics_text += f"{clean_name} {value}\n"
         return metrics_text
 
 class MetricsHandler(BaseHTTPRequestHandler):
