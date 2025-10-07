@@ -90,10 +90,16 @@
       },
       "targets": [
         {
-          "expr": "mediamtx_paths_total",
+          "expr": "sum(paths)",
           "interval": "",
-          "legendFormat": "Active MediaMTX Paths",
+          "legendFormat": "Total Active Paths",
           "refId": "A"
+        },
+        {
+          "expr": "sum by (name,state) (paths)",
+          "interval": "",
+          "legendFormat": "{{name}} - {{state}}",
+          "refId": "B"
         }
       ],
       "title": "Active Paths",
@@ -171,10 +177,16 @@
       },
       "targets": [
         {
-          "expr": "mediamtx_bytes_received_total",
+          "expr": "sum(rate(paths_bytes_received[1m]))",
           "interval": "",
-          "legendFormat": "MediaMTX Bytes Received (Total)",
+          "legendFormat": "Bytes Received/sec",
           "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (rate(paths_bytes_received[1m]))",
+          "interval": "",
+          "legendFormat": "{{name}}",
+          "refId": "B"
         }
       ],
       "title": "Bytes Received from Sources",
@@ -252,10 +264,16 @@
       },
       "targets": [
         {
-          "expr": "mediamtx_bytes_sent_total",
+          "expr": "sum(rate(paths_bytes_sent[1m]))",
           "interval": "",
-          "legendFormat": "MediaMTX Bytes Sent (Total)",
+          "legendFormat": "Bytes Sent/sec",
           "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (rate(paths_bytes_sent[1m]))",
+          "interval": "",
+          "legendFormat": "{{name}}",
+          "refId": "B"
         }
       ],
       "title": "Bytes Sent to Viewers",
@@ -333,10 +351,16 @@
       },
       "targets": [
         {
-          "expr": "mediamtx_readers_total",
+          "expr": "sum(paths_readers)",
           "interval": "",
-          "legendFormat": "Active MediaMTX Readers",
+          "legendFormat": "Total Active Readers",
           "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (paths_readers)",
+          "interval": "",
+          "legendFormat": "{{name}}",
+          "refId": "B"
         }
       ],
       "title": "Active Readers/Viewers",
@@ -414,10 +438,28 @@
       },
       "targets": [
         {
-          "expr": "mediamtx_connections_total",
+          "expr": "rtsp_conns + rtmp_conns + srt_conns",
           "interval": "",
-          "legendFormat": "Total MediaMTX Connections",
+          "legendFormat": "Total Connections",
           "refId": "A"
+        },
+        {
+          "expr": "rtsp_conns",
+          "interval": "",
+          "legendFormat": "RTSP Connections",
+          "refId": "B"
+        },
+        {
+          "expr": "rtmp_conns",
+          "interval": "",
+          "legendFormat": "RTMP Connections",
+          "refId": "C"
+        },
+        {
+          "expr": "srt_conns",
+          "interval": "",
+          "legendFormat": "SRT Connections",
+          "refId": "D"
         }
       ],
       "title": "Total Server Connections",
@@ -497,8 +539,20 @@
         {
           "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "interval": "",
-          "legendFormat": "MediaMTX CPU Usage %",
+          "legendFormat": "CPU Usage %",
           "refId": "A"
+        },
+        {
+          "expr": "mediamtx_exporter_up",
+          "interval": "",
+          "legendFormat": "MediaMTX Exporter Status",
+          "refId": "B"
+        },
+        {
+          "expr": "up{job=\"mediamtx-direct\"}",
+          "interval": "",
+          "legendFormat": "Direct MediaMTX Scrape Status",
+          "refId": "C"
         }
       ],
       "title": "Server CPU Usage",
