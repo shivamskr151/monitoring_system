@@ -438,9 +438,9 @@
       },
       "targets": [
         {
-          "expr": "rtsp_conns + rtmp_conns + srt_conns",
+          "expr": "sum(paths_readers)",
           "interval": "",
-          "legendFormat": "Total Connections",
+          "legendFormat": "Total Readers (All Protocols)",
           "refId": "A"
         },
         {
