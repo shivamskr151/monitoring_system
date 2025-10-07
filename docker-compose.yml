@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -16,6 +18,8 @@ services:
       - '--web.enable-lifecycle'
     networks:
       - monitoring
+    depends_on:
+      - mediamtx
     restart: unless-stopped
 
   grafana:
@@ -37,18 +41,14 @@ services:
     image: bluenviron/mediamtx:latest
     container_name: mediamtx
     ports:
+      - "8554:8554"
+      - "1935:1935"
       - "8887:8887"
       - "8888:8888"
       - "8889:8889"
-      - "8554:8554"
-      - "1935:1935"
       - "9998:9998"
     volumes:
-      - ./mediamtx-clean.yml:/mediamtx.yml
-    environment:
-      - MTX_LOG_LEVEL=info
-      - MTX_AUTH=none
-      - MTX_METRICS_AUTH=none
+      - ./mediamtx.yml:/mediamtx.yml
     networks:
       - monitoring
     restart: unless-stopped
@@ -89,7 +89,6 @@ services:
     networks:
       - monitoring
     restart: unless-stopped
-
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest

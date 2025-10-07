@@ -1,5 +1,37 @@
 logLevel: info
 
+# Enable API and metrics
+api: yes
+apiAddress: ":8887"
+
+metrics: yes
+metricsAddress: ":9998"
+
+# Authentication method
+authMethod: internal
+
+# Internal users and their permissions
+authInternalUsers:
+  # allow anonymous (any) to do basic operations (read, playback)
+  - user: any
+    pass: ""
+    ips: []
+    permissions:
+      - action: read
+      - action: playback
+
+  # a “superuser” to access API, metrics, etc.
+  - user: admin
+    pass: secret123
+    ips: []
+    permissions:
+      - action: api
+      - action: metrics
+      - action: publish
+      - action: read
+      - action: playback
+
+# Protocols and addresses
 rtsp: yes
 rtspAddress: ":8554"
 
@@ -15,17 +47,11 @@ webrtc: yes
 webrtcAddress: ":8889"
 webrtcAllowOrigin: "*"
 
-api: yes
-apiAddress: ":8887"
-
-metrics: yes
-metricsAddress: ":9998"
-
 paths:
   camera1:
     source: rtsp://admin:Tatva%40321@183.82.113.87:554/Streaming/Channels/301
     sourceOnDemand: yes
-  
+
   camera2:
     source: rtsp://admin:admin@192.168.1.4:1935
     sourceOnDemand: yes

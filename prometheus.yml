@@ -13,15 +13,15 @@ scrape_configs:
     scrape_interval: 15s
     metrics_path: '/metrics'
 
-  # Direct MediaMTX metrics scraping with authentication
+  # Direct MediaMTX metrics scraping (with authentication)
   - job_name: 'mediamtx-direct'
     static_configs:
       - targets: ['mediamtx:9998']
     scrape_interval: 5s
     metrics_path: '/metrics'
     basic_auth:
-      username: 'mediamtx'
-      password: 'mediamtx'
+      username: 'admin'
+      password: 'secret123'
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -40,8 +40,8 @@ scrape_configs:
   - job_name: 'mediamtx-exporter'
     static_configs:
       - targets: ['mediamtx-exporter:8080']
-    scrape_interval: 10s
-    scrape_timeout: 15s
+    scrape_interval: 15s
+    scrape_timeout: 10s
     metrics_path: '/metrics'
     relabel_configs:
       - source_labels: [__address__]
