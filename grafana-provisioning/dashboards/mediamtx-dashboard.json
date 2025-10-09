@@ -30,6 +30,331 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "binBps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Inbound Rate"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Outbound Rate"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(paths_bytes_received[1m]))",
+          "interval": "",
+          "legendFormat": "Total Inbound Rate",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(paths_bytes_sent[1m]))",
+          "interval": "",
+          "legendFormat": "Total Outbound Rate",
+          "refId": "B"
+        },
+        {
+          "expr": "sum by (name) (rate(paths_bytes_received[1m]))",
+          "interval": "",
+          "legendFormat": "{{name}} - Inbound",
+          "refId": "C"
+        },
+        {
+          "expr": "sum by (name) (rate(paths_bytes_sent[1m]))",
+          "interval": "",
+          "legendFormat": "{{name}} - Outbound",
+          "refId": "D"
+        }
+      ],
+      "title": "📊 Real-time Data Transfer Rates (Bytes/sec)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10000000
+              },
+              {
+                "color": "orange",
+                "value": 50000000
+              },
+              {
+                "color": "red",
+                "value": 100000000
+              }
+            ]
+          },
+          "unit": "binBps",
+          "min": 0,
+          "max": 200000000
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(paths_bytes_sent[1m]))",
+          "interval": "",
+          "legendFormat": "Outbound Bandwidth",
+          "refId": "A"
+        }
+      ],
+      "title": "🚀 Outbound Bandwidth (1m)",
+      "type": "gauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "short",
+          "min": 0,
+          "max": 50
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "sum(paths_readers)",
+          "interval": "",
+          "legendFormat": "Active Readers",
+          "refId": "A"
+        }
+      ],
+      "title": "👥 Active Readers/Viewers",
+      "type": "gauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "orange",
+                "value": 85
+              },
+              {
+                "color": "red",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "interval": "",
+          "legendFormat": "CPU Usage",
+          "refId": "A"
+        }
+      ],
+      "title": "💻 CPU Usage",
+      "type": "gauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
@@ -63,7 +388,181 @@
               },
               {
                 "color": "red",
-                "value": 0.5
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(paths_bytes_received)",
+          "interval": "",
+          "legendFormat": "Total Data Received",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (paths_bytes_received)",
+          "interval": "",
+          "legendFormat": "{{name}} - Received",
+          "refId": "B"
+        }
+      ],
+      "title": "📥 Total Data Received (Cumulative)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(paths_bytes_sent)",
+          "interval": "",
+          "legendFormat": "Total Data Sent",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (paths_bytes_sent)",
+          "interval": "",
+          "legendFormat": "{{name}} - Sent",
+          "refId": "B"
+        }
+      ],
+      "title": "📤 Total Data Sent (Cumulative)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
@@ -75,17 +574,215 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 24
       },
-      "id": 1,
+      "id": 7,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(paths_readers)",
+          "interval": "",
+          "legendFormat": "Total Active Readers",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (paths_readers)",
+          "interval": "",
+          "legendFormat": "{{name}} - Readers",
+          "refId": "B"
+        }
+      ],
+      "title": "👥 Active Readers Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rtsp_conns",
+          "interval": "",
+          "legendFormat": "RTSP Connections",
+          "refId": "A"
+        },
+        {
+          "expr": "rtmp_conns",
+          "interval": "",
+          "legendFormat": "RTMP Connections",
+          "refId": "B"
+        },
+        {
+          "expr": "srt_conns",
+          "interval": "",
+          "legendFormat": "SRT Connections",
+          "refId": "C"
+        },
+        {
+          "expr": "webrtc_sessions",
+          "interval": "",
+          "legendFormat": "WebRTC Sessions",
+          "refId": "D"
+        },
+        {
+          "expr": "rtsp_sessions",
+          "interval": "",
+          "legendFormat": "RTSP Sessions",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(paths_readers)",
+          "interval": "",
+          "legendFormat": "Total Active Readers",
+          "refId": "F"
+        }
+      ],
+      "title": "🔗 Protocol Connections",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": ["last", "max", "mean"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
         }
       },
       "targets": [
@@ -102,648 +799,13 @@
           "refId": "B"
         }
       ],
-      "title": "Active Paths",
+      "title": "📡 Active Streaming Paths",
       "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "binBps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "sum(rate(paths_bytes_received[1m]))",
-          "interval": "",
-          "legendFormat": "Bytes Received/sec",
-          "refId": "A"
-        },
-        {
-          "expr": "sum by (name) (rate(paths_bytes_received[1m]))",
-          "interval": "",
-          "legendFormat": "{{name}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Bytes Received from Sources",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "binBps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "sum(rate(paths_bytes_sent[1m]))",
-          "interval": "",
-          "legendFormat": "Bytes Sent/sec",
-          "refId": "A"
-        },
-        {
-          "expr": "sum by (name) (rate(paths_bytes_sent[1m]))",
-          "interval": "",
-          "legendFormat": "{{name}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Bytes Sent to Viewers",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "sum(paths_readers)",
-          "interval": "",
-          "legendFormat": "Total Active Readers",
-          "refId": "A"
-        },
-        {
-          "expr": "sum by (name) (paths_readers)",
-          "interval": "",
-          "legendFormat": "{{name}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Active Readers/Viewers",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "sum(paths_readers)",
-          "interval": "",
-          "legendFormat": "Total Readers (All Protocols)",
-          "refId": "A"
-        },
-        {
-          "expr": "rtsp_conns",
-          "interval": "",
-          "legendFormat": "RTSP Connections",
-          "refId": "B"
-        },
-        {
-          "expr": "rtmp_conns",
-          "interval": "",
-          "legendFormat": "RTMP Connections",
-          "refId": "C"
-        },
-        {
-          "expr": "srt_conns",
-          "interval": "",
-          "legendFormat": "SRT Connections",
-          "refId": "D"
-        }
-      ],
-      "title": "Total Server Connections",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "interval": "",
-          "legendFormat": "CPU Usage %",
-          "refId": "A"
-        },
-        {
-          "expr": "mediamtx_exporter_up",
-          "interval": "",
-          "legendFormat": "MediaMTX Exporter Status",
-          "refId": "B"
-        },
-        {
-          "expr": "up{job=\"mediamtx-direct\"}",
-          "interval": "",
-          "legendFormat": "Direct MediaMTX Scrape Status",
-          "refId": "C"
-        }
-      ],
-      "title": "Server CPU Usage",
-      "type": "timeseries"
-    }
-    ,
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 10000000
-              },
-              {
-                "color": "red",
-                "value": 50000000
-              }
-            ]
-          },
-          "unit": "binBps",
-          "min": 0
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 24
-      },
-      "id": 101,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "targets": [
-        {
-          "expr": "sum(rate(paths_bytes_sent[1m]))",
-          "interval": "",
-          "legendFormat": "Outbound",
-          "refId": "A"
-        }
-      ],
-      "title": "Outbound Bandwidth (1m)",
-      "type": "gauge"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 50
-              }
-            ]
-          },
-          "unit": "short",
-          "min": 0
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 24
-      },
-      "id": 102,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "targets": [
-        {
-          "expr": "sum(paths_readers)",
-          "interval": "",
-          "legendFormat": "Readers",
-          "refId": "A"
-        }
-      ],
-      "title": "Active Readers",
-      "type": "gauge"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent",
-          "min": 0,
-          "max": 100
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 24
-      },
-      "id": 103,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "targets": [
-        {
-          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "interval": "",
-          "legendFormat": "CPU %",
-          "refId": "A"
-        }
-      ],
-      "title": "CPU Usage",
-      "type": "gauge"
     }
   ],
   "schemaVersion": 30,
   "style": "dark",
-  "tags": ["mediamtx", "streaming", "monitoring"],
+  "tags": ["mediamtx", "streaming", "monitoring", "data-transfer"],
   "templating": {
     "list": []
   },
@@ -754,7 +816,7 @@
   "timepicker": {},
   "refresh": "5s",
   "timezone": "",
-  "title": "MediaMTX Monitoring Dashboard",
-  "uid": "mediamtx-dashboard",
+  "title": "MediaMTX Data Streaming Dashboard",
+  "uid": "mediamtx-data-dashboard",
   "version": 1
 }
