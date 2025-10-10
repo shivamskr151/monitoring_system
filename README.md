@@ -38,15 +38,70 @@ Benefits: zero manual setup, version-controlled config, consistent deployments.
 Current settings based on `mediamtx.yml` and `docker-compose.yml`:
 
 - **Grafana**: `admin` / `admin` (change via `GF_SECURITY_ADMIN_PASSWORD`)
-- **MediaMTX auth**: `authMethod: internal`
-  - Anonymous user `any` has read/playback only
-  - Admin user: `admin` / `secret123` with API, metrics, publish, read, playback
-- **MediaMTX API** (`:8887`): requires admin permissions
-- **MediaMTX Metrics** (`:9998/metrics`): requires admin auth when scraped directly
+- **MediaMTX auth**: `authMethod: http`
+  - Authentication handled by external backend at `http://backend:8000/mediamtx/auth`
+  - No internal users configured - all authentication delegated to your backend
+- **MediaMTX API** (`:8887`): requires external authentication
+- **MediaMTX Metrics** (`:9998/metrics`): accessible without hardcoded credentials (external auth)
 - **Prometheus**: no auth enabled
 - **Exporters (custom, node, cAdvisor)**: no auth enabled
 
-Note: Prometheus is configured to scrape MediaMTX directly with basic auth and also via the custom exporter.
+**External Authentication Benefits:**
+- Centralized user management through your backend
+- Dynamic user addition/removal without MediaMTX restarts
+- Role-based access control (Admin, Viewer, Guest permissions)
+- Token-based security (JWT, API keys)
+- Integration with your existing authentication system
+
+Note: You need to implement the authentication endpoint in your backend. See `example-backend-auth.py` for reference.
+
+## 🔧 External Authentication Setup
+
+### Backend Authentication Endpoint
+
+Your backend must implement an authentication endpoint that MediaMTX will call for each request. The endpoint should:
+
+1. **Accept POST requests** at the URL specified in `authExternalURL`
+2. **Receive form data** with these fields:
+   - `user`: Username
+   - `pass`: Password
+   - `ip`: Client IP address
+   - `action`: Requested action (read, publish, api, metrics, playback)
+   - `path`: MediaMTX path being accessed
+
+3. **Return appropriate HTTP status codes**:
+   - `200 OK`: Authentication and authorization successful
+   - `401 Unauthorized`: Authentication failed (invalid credentials)
+   - `403 Forbidden`: User authenticated but lacks permission for this action
+
+### Example Implementation
+
+See `example-backend-auth.py` for a complete Flask-based implementation that demonstrates:
+- User authentication with password verification
+- IP-based access control
+- Role-based permissions (Admin, Viewer, Guest)
+- Proper HTTP status code responses
+
+### Integration Steps
+
+1. **Update the auth URL** in `mediamtx.yml`:
+   ```yaml
+   authHTTPAddress: http://your-backend:8000/mediamtx/auth
+   ```
+
+2. **Implement the endpoint** in your backend service
+
+3. **Test the integration**:
+   ```bash
+   # Test authentication endpoint
+   curl -X POST http://your-backend:8000/mediamtx/auth \
+     -d "user=admin&pass=admin123&ip=127.0.0.1&action=read&path=camera1"
+   ```
+
+4. **Restart MediaMTX** to apply the new configuration:
+   ```bash
+   docker-compose restart mediamtx
+   ```
 
 ## 🚀 Quick Start
 
@@ -81,14 +136,14 @@ docker-compose logs -f grafana
 |---------|-----|-------------|---------|
 | Grafana | [http://localhost:3000](http://localhost:3000) | admin / admin | Visualization dashboard |
 | Prometheus | [http://localhost:9090](http://localhost:9090) | - | Metrics query interface |
-| MediaMTX API | [http://localhost:8887](http://localhost:8887) | admin / secret123 | Stream management API |
-| MediaMTX Metrics (direct) | [http://localhost:9998/metrics](http://localhost:9998/metrics) | admin / secret123 | Native metrics |
+| MediaMTX API | [http://localhost:8887](http://localhost:8887) | External auth required | Stream management API |
+| MediaMTX Metrics (direct) | [http://localhost:9998/metrics](http://localhost:9998/metrics) | External auth required | Native metrics |
 | MediaMTX Exporter | [http://localhost:8081/metrics](http://localhost:8081/metrics) | - | Re-exposed MediaMTX metrics |
 | Node Exporter | [http://localhost:9100/metrics](http://localhost:9100/metrics) | - | System metrics |
 | cAdvisor | [http://localhost:8080/metrics](http://localhost:8080/metrics) | - | Container metrics |
-| RTSP Stream | rtsp://localhost:8554/camera1 | - | Video stream access |
-| HLS Stream | [http://localhost:8888/camera1/index.m3u8](http://localhost:8888/camera1/index.m3u8) | - | HLS video stream |
-| WebRTC Stream | [http://localhost:8889/camera1](http://localhost:8889/camera1) | - | WebRTC video stream |
+| RTSP Stream | rtsp://localhost:8554/camera1 | External auth required | Video stream access |
+| HLS Stream | [http://localhost:8888/camera1/index.m3u8](http://localhost:8888/camera1/index.m3u8) | External auth required | HLS video stream |
+| WebRTC Stream | [http://localhost:8889/camera1](http://localhost:8889/camera1) | External auth required | WebRTC video stream |
 
 ## 📹 Camera Configuration (in `mediamtx.yml`)
 
@@ -124,7 +179,7 @@ Warning: The repository's `mediamtx.yml` currently contains sample credentials a
 
 ### Prometheus scrape configuration (`prometheus.yml`)
 - Prometheus → itself at `localhost:9090`
-- Prometheus → MediaMTX (direct) at `mediamtx:9998/metrics` using basic auth (`admin/secret123`)
+- Prometheus → MediaMTX (direct) at `mediamtx:9998/metrics` (external auth)
 - Prometheus → MediaMTX Exporter at `mediamtx-exporter:8080/metrics`
 - Prometheus → Node Exporter at `node-exporter:9100`
 - Prometheus → cAdvisor at `cadvisor:8080`
@@ -132,7 +187,7 @@ Warning: The repository's `mediamtx.yml` currently contains sample credentials a
 ### Custom exporter (`mediamtx-exporter.py`)
 - Serves on `:8080` inside container, mapped to host `:8081`
 - Endpoints: `/metrics`, `/health`
-- Attempts auth to MediaMTX metrics with `admin/secret123` first; falls back to alternatives
+- Accesses MediaMTX metrics without hardcoded credentials (external authentication)
 - Emits at least:
   - `mediamtx_exporter_up`
   - `mediamtx_exporter_scrape_duration_seconds`
@@ -235,8 +290,9 @@ docker-compose ps
 ## 🚨 Troubleshooting
 
 1. **MediaMTX metrics 401/403**
-   - Use basic auth `admin/secret123` when scraping directly
-   - Confirm `authMethod: internal` and `authInternalUsers` in `mediamtx.yml`
+   - Check external authentication endpoint is accessible at `http://backend:8000/mediamtx/auth`
+   - Verify `authMethod: http` and `authHTTPAddress` in `mediamtx.yml`
+   - Ensure your backend authentication service is running and responding correctly
 
 2. **Prometheus targets down**
    - Check http://localhost:9090/targets
@@ -256,7 +312,7 @@ docker-compose ps
 ## 🔄 Maintenance & Hardening
 
 - Change Grafana admin password via `GF_SECURITY_ADMIN_PASSWORD`
-- Rotate MediaMTX admin password in `mediamtx.yml` and `prometheus.yml`
+- Manage MediaMTX user authentication through your backend service
 - Keep Docker images updated; back up configuration files
 - Consider enabling TLS for WebRTC and limiting exposed ports in production
 

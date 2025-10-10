@@ -29,46 +29,31 @@ class MediaMTXExporter:
 
     def fetch_real_metrics(self):
         """Fetch real metrics from MediaMTX endpoint"""
-        # MediaMTX metrics endpoint requires authentication
-        auth_methods = [
-            ("admin", "secret123"),  # Correct MediaMTX credentials from config
-            None,  # No auth fallback
-            ("admin", "admin"),  # Default MediaMTX credentials
-            ("mediamtx", "mediamtx"),
-            ("root", "root"),
-            ("admin", ""),
-            ("", ""),
-        ]
-        
-        for auth in auth_methods:
-            try:
-                response = self.session.get(self.metrics_url, auth=auth, timeout=10)
-                response.raise_for_status()
-                logger.info(f"Successfully fetched real MediaMTX metrics with auth: {auth}")
-                return response.text
-            except requests.exceptions.HTTPError as e:
-                if e.response.status_code == 401:
-                    logger.debug(f"Authentication failed for {auth}: {e}")
-                    continue
-                else:
-                    logger.error(f"HTTP error for auth {auth}: {e}")
-                    continue
-            except requests.exceptions.Timeout:
-                logger.warning(f"Timeout for auth {auth} - MediaMTX may be slow")
-                continue
-            except requests.exceptions.ConnectionError:
-                logger.warning(f"Connection error for auth {auth} - MediaMTX may be unavailable")
-                continue
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Request failed for auth {auth}: {e}")
-                continue
-            except Exception as e:
-                logger.error(f"Unexpected error for auth {auth}: {e}")
-                continue
-        
-        logger.warning("All authentication methods failed for MediaMTX metrics")
-        # Return empty string - no dummy data, only real data
-        return ""
+        # With external authentication, MediaMTX metrics endpoint should be accessible
+        # without hardcoded credentials since authentication is handled by the backend
+        try:
+            response = self.session.get(self.metrics_url, timeout=10)
+            response.raise_for_status()
+            logger.info("Successfully fetched real MediaMTX metrics with external authentication")
+            return response.text
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 401:
+                logger.error("Authentication failed - check external auth configuration")
+            else:
+                logger.error(f"HTTP error accessing MediaMTX metrics: {e}")
+            return ""
+        except requests.exceptions.Timeout:
+            logger.warning("Timeout accessing MediaMTX metrics - MediaMTX may be slow")
+            return ""
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error - MediaMTX may be unavailable")
+            return ""
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request failed accessing MediaMTX metrics: {e}")
+            return ""
+        except Exception as e:
+            logger.error(f"Unexpected error accessing MediaMTX metrics: {e}")
+            return ""
     
 
     def update_metrics(self):
@@ -189,9 +174,9 @@ class MetricsHandler(BaseHTTPRequestHandler):
 
 def run_exporter():
     global exporter
-    # No authentication needed - MediaMTX auth is disabled
+    # External authentication configured - MediaMTX handles auth through backend
     exporter = MediaMTXExporter()
-    logger.info("MediaMTX exporter started - authentication disabled")
+    logger.info("MediaMTX exporter started - external authentication enabled")
     def update_loop():
         while True:
             try:

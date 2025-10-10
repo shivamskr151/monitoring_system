@@ -8,28 +8,10 @@ metrics: yes
 metricsAddress: ":9998"
 
 # Authentication method
-authMethod: internal
+authMethod: http
 
-# Internal users and their permissions
-authInternalUsers:
-  # allow anonymous (any) to do basic operations (read, playback)
-  - user: any
-    pass: ""
-    ips: []
-    permissions:
-      - action: read
-      - action: playback
-
-  # a “superuser” to access API, metrics, etc.
-  - user: admin
-    pass: secret123
-    ips: []
-    permissions:
-      - action: api
-      - action: metrics
-      - action: publish
-      - action: read
-      - action: playback
+# External authentication URL - replace with your backend URL
+authHTTPAddress: http://backend:8000/mediamtx/auth
 
 # Protocols and addresses
 rtsp: yes
