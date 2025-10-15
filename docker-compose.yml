@@ -59,6 +59,8 @@ services:
       - ./mediamtx.yml:/mediamtx.yml
     networks:
       - monitoring
+    depends_on:
+      - backend
     restart: unless-stopped
     logging:
       driver: "json-file"
@@ -106,8 +108,8 @@ services:
 
   mediamtx-exporter:
     build:
-      context: .
-      dockerfile: Dockerfile.mediamtx-exporter
+      context: ./mediamtx-exporter
+      dockerfile: Dockerfile
     container_name: mediamtx-exporter
     ports:
       - "${EXPORTER_HOST_PORT:-8081}:8080"
@@ -128,19 +130,16 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
-      - "${CADVISOR_PORT:-8080}:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    devices:
-      - /dev/kmsg
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - FLASK_ENV=production
     networks:
       - monitoring
     restart: unless-stopped

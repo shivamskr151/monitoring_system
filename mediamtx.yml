@@ -11,7 +11,7 @@ metricsAddress: ":9998"
 authMethod: http
 
 # External authentication URL - replace with your backend URL
-authHTTPAddress: http://backend:8000/mediamtx/auth
+authHTTPAddress: http://localhost:8000/mediamtx/auth
 
 # Protocols and addresses
 rtsp: yes

@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class MediaMTXExporter:
-    def __init__(self, metrics_url="http://mediamtx:9998/metrics", auth=None):
+    def __init__(self, metrics_url="http://localhost:9998/metrics", auth=None):
         self.metrics_url = metrics_url
         self.auth = auth
         self.metrics_data = {}
